@@ -1,0 +1,19 @@
+# shellcheck shell=bash
+# .bash_options
+
+declare -x HISTCONTROL
+
+_SHOPTS=(checkwinsize autocd)
+_SETTINGS=(emacs noclobber)
+
+# shellcheck disable=SC2048,SC2086
+shopt -s ${_SHOPTS[*]}
+
+# shellcheck disable=SC2048,SC2086
+set -o ${_SETTINGS[*]}
+
+HISTCONTROL=ignoreboth:erasedups
+
+unset _SETTINGS _SHOPTS
+
+# vim: ft=sh

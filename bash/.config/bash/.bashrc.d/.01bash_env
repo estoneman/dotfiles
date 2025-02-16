@@ -1,0 +1,130 @@
+# shellcheck shell=bash
+# .bash_env
+
+declare -x DOCKER_HOST EDITOR KUBE_EDITOR PATH PROMPT_COMMAND TERM VISUAL
+
+_UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
+_WHICH=/usr/bin/which
+
+DOCKER_HOST="unix:///$HOME/.rd/docker.sock"
+EDITOR=nvim
+KUBE_EDITOR="$EDITOR"
+PATH="$HOME/.local/share/nvim/mason/bin:$HOME/.cargo/bin:$HOME/.local/bin/:/usr/local/bin:/usr/local/sbin:/opt/bin:/usr/bin:/usr/sbin:/bin:/sbin"
+TERM='tmux-256color'
+VISUAL=nvim
+
+PROMPT_COMMAND=_prompt_command
+
+_parse_git_branch () {
+    git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+
+_prompt_command () {
+    local _exit="${PIPESTATUS[-1]}"
+    PS1=
+
+    local _DULL_PINK _EXIT_BAD _EXIT_GOOD _LIGHT_GREY _PEACH _PERIWINKLE _RESET _TANGERINE _TEAL
+
+    if [ -x /usr/bin/tput ]; then
+        tput init
+
+        _RESET="\[$(tput sgr0)\]"
+        _PEACH="\[$(tput setaf 180)\]"
+        _LIGHT_GREY="\[$(tput setaf 254)\]"
+        _PERIWINKLE="\[$(tput setaf 104)\]"
+        _TANGERINE="\[$(tput setaf 208)\]"
+        _TEAL="\[$(tput setaf 66)\]"
+        _DULL_PINK="\[$(tput setaf 168)\]"
+        _EXIT_GOOD="\[$(tput setaf 109)\]"
+        _EXIT_BAD="\[$(tput setaf 211)\]"
+
+        _RIGHT_ANGLE_PIPE=$'\u255a'
+        _HORIZONTAL_PIPE=$'\u2550'
+
+        if [ -n "${VIRTUAL_ENV_PROMPT:-}" ]; then
+            if ! [[ "$VIRTUAL_ENV_PROMPT" =~ ^\( ]]; then
+                PS1+="(${VIRTUAL_ENV_PROMPT}) "
+            else
+                PS1+="${VIRTUAL_ENV_PROMPT}"
+            fi
+        fi
+
+        if [ -z "$TMUX" ] ; then
+            PS1+="${_PERIWINKLE}[\D{%Y/%m/%d-%H:%M:%S}]${_RESET} "
+        fi
+
+        PS1+="${_LIGHT_GREY}\w${_RESET}$(_parse_git_branch)"
+        PS1+='\n'
+
+        if [ "$_exit" -eq 0 ]; then
+            PS1+="${_EXIT_GOOD}"
+        else
+            PS1+="${_EXIT_BAD}"
+        fi
+
+        PS1+="${_RIGHT_ANGLE_PIPE}${_HORIZONTAL_PIPE} ($_exit) \$ ${_RESET}"
+    else
+        PS1='(\t):\W \$ '
+    fi
+}
+
+# fzf
+# shellcheck disable=SC1091
+[ -f "$HOME/.fzf.bash" ] && source "$HOME/.fzf.bash"
+
+# zoxide
+[ -x "$("$_WHICH" zoxide)" ] && eval "$(zoxide init bash)"
+
+# go packages
+[ -d "$HOME/go/bin" ] && PATH="$HOME/go/bin:$PATH"
+
+# shellcheck disable=SC1091
+case "$_UNAME" in
+    darwin)
+        # conda
+        [ -r "/Users/estoneman/anaconda3/etc/profile.d/conda.sh" ] \
+            && . "/Users/estoneman/anaconda3/etc/profile.d/conda.sh" \
+            || PATH="/Users/estoneman/anaconda3/bin:$PATH"
+        
+        # google sdk
+        [ -f '/Users/estoneman/google-cloud-sdk/path.bash.inc' ] \
+            && . '/Users/estoneman/google-cloud-sdk/path.bash.inc'
+        
+        # envman
+        # shellcheck disable=SC1091
+        [ -s "$HOME/.config/envman/load.sh" ] \
+            && source "$HOME/.config/envman/load.sh"
+        
+        CLOUDSDK_PYTHON="$(which python3)"
+        GHC_HOME=~/.ghcup/bin
+        METASPLOIT_HOME=/opt/metasploit-framework
+        NIM_HOME=~/.nimble/bin
+        WASMTIME_HOME=~/.wasmtime/bin
+        
+        # java
+        PATH="/usr/local/opt/openjdk/bin:$PATH"
+        # podman
+        PATH="/opt/podman/bin:$PATH"
+        # rancher
+        PATH="$HOME/.rd/bin:$PATH"
+        # wastime
+        PATH="/usr/local/opt/wabt/bin:$PATH"
+        
+        PATH="$PATH:$METASPLOIT_HOME/bin:$CARGO_HOME:$GHC_HOME:$NIM_HOME:$WASMTIME_HOME:."
+        
+        MANPATH="/usr/local/Cellar/bash/5.2.15/share/man/man1:$MANPATH"
+        MANPATH="$HOME/.local/share/man:$MANPATH"
+        
+        export CLOUDSDK_PYTHON GHC_HOME MANPATH METASPLOIT_HOME NIM_HOME WASMTIME_HOME
+        ;;
+    linux)
+        # catch this case, but do nothing
+        ;;
+    *)
+        echo "unknown os: $_UNAME" && return
+        ;;
+esac
+
+unset _UNAME _WHICH
+
+# vim: ft=sh

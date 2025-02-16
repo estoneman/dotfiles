@@ -1,0 +1,250 @@
+# shellcheck shell=bash
+# .bash_aliases
+
+_UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
+_WHICH=/usr/bin/which
+
+# helpful ls
+alias ls='ls --color=auto'
+alias la='ls -lAF'
+alias l='ls -lhF'
+alias ll='ls -lhF'
+alias lt='ls -lhFt'
+alias li='ls -lihF'
+alias lsz='ls -lShF'
+
+# safety
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# common
+if "$_WHICH" bat &>/dev/null; then
+    alias cat='bat'
+fi
+
+if "$_WHICH" htop &>/dev/null; then
+    alias htop='htop -d 12' # -d (delay) is measured in tenths of a second
+fi
+
+if "$_WHICH" kubectl &>/dev/null; then
+    alias k='kubectl'
+fi
+
+if "$_WHICH" nvim &>/dev/null; then
+    alias vi='vim'
+    alias vim='nvim'
+    alias view='vim -R'
+fi
+
+if "$_WHICH" tmux &>/dev/null; then
+    alias tmnew='tmux new -s'
+fi
+
+if type -t z &>/dev/null && "$_WHICH" zoxide &>/dev/null; then
+    alias cd='z'
+fi
+
+docker_tags() {
+	if [ -z "$1" ]; then
+		cat <<HELP
+show tags of a docker hub repository
+
+usage:
+
+    $ docker_tags <repository> [page_size(default: 100)]
+
+example:
+
+    $ docker_tags debian 50 # shows the next 50 tags of the debian repository
+    1.1.1
+    alpine
+    1.11.9
+    ...
+HELP
+		return;
+	fi
+	curl -sSL "https://hub.docker.com/v2/namespaces/library/repositories/$1/tags?page_size=${2:-100}" | \
+		jq -r '.results[].name'
+}
+
+get_srvcert() {
+    if [ -z "$1" ]; then
+        echo 'usage: get_srvcert <server-name> [port(default: 443)]' && return
+    fi
+
+    openssl s_client \
+        -connect "$1:${2:-443}" \
+        -servername "$1" 2>/dev/null </dev/null \
+    | sed -ne '/BEGIN CERTIFICATE/,/END CERTIFICATE/p'
+}
+
+mkcd() {
+    mkdir -p "$@" && cd "$_" || return
+}
+
+ping_check() {
+    while ! ping -c 1 -W 3 "$1"; do
+        sleep 1
+        clear
+    done
+}
+
+if "$_WHICH" rg &>/dev/null; then
+    rgf() {
+        if [ -z "$1" ]; then
+            echo 'usage: rgf <file-pattern> [<root-search-directory>]' && return
+        fi
+    
+        rg --hidden --files "${2:-.}" 2>&1 | rg "$1" | sort
+    }
+    
+    rgd() {
+        if [ -z "$1" ]; then
+            echo 'usage: rgd <directory-pattern> [<root-search-directory>]' && return
+        fi
+    
+        rg --hidden --files --null "${2:-.}" 2>&1 | \
+            xargs -0 dirname | \
+            rg "$1" | \
+            uniq
+    }
+fi
+
+source_venv() {
+    local _venv_base _venv_available
+
+    if [ -d "$HOME/.local/pipx/venvs"  ]; then
+        _venv_base="$HOME/.local/pipx/venvs"
+    fi
+
+    if [ -d "$HOME/.local/share/pipx/venvs"  ]; then
+        _venv_base="$HOME/.local/share/pipx/venvs"
+    fi
+
+    _venv_available="$(ls -A "$_venv_base")"
+
+    if [ -z "$1" ]; then
+        echo 'usage: source_venv <venv>'
+        printf "available virtual environments:\n%s\n" "$_venv_available" && return
+    elif ! [ -d "$_venv_base/$1" ]; then
+        printf "virtual environment '%s' does not exist" "$1"
+        printf "available virtual environments:\n%s\n" "$_venv_available" && return
+    fi
+
+    # shellcheck disable=SC1091,1090
+    source "$_venv_base/$1/bin/activate"
+}
+
+test_connect() {
+    local _host _port
+
+    _host="${1:-google.com}"
+    _port="${2:-443}"
+
+    if ! nc -zw 1 "$_host" "$_port" &>/dev/null; then
+        cat <<-EOF
+Could not connect to $_host:$_port
+If behind VPN, restart wsl-vpnkit if on WSL
+EOF
+    fi
+
+    printf "connection to %s via tcp/%d successful\n" "$_host" "$_port"
+}
+
+if alias tmnew &>/dev/null; then
+    tmnewn() {
+    	if [ -z "$1" ]; then
+    		tmnew "${PWD##*/}" && return
+    	fi
+    
+    	tmnew "$1"
+    }
+fi
+
+case "$_UNAME" in
+    darwin)
+        alias brew_all='brew update && brew upgrade && brew cleanup'
+        alias keepassxc-cli='/Applications/KeePassXC.app/Contents/MacOS/keepassxc-cli'
+        alias sourcev="source .virtualenv/bin/activate"
+        alias sourcepipx='source ~/.local/pipx/venvs/virtualenv/bin/activate'
+        alias vboxlistr='VBoxManage list runningvms'
+        alias vboxlistv='VBoxManage list vms | cut -d\" -f2'
+        
+        battery() {
+            pmset -g batt | \
+                awk 'NR == 2 { printf("battery:\n    - state: %s\n    - level: %s\n", substr($4, 0, length($4) - 1), substr($3, 0, length($3) - 1)) }'
+        }
+        
+        gssh() {
+            # $1 => name of gcp compute instance
+            # $2 => project
+            if [ -z "$1" ] || [ -z "$2" ]; then
+                echo '[ERROR] not enough arguments supplied'
+                echo 'usage: gssh <instance> <gcp-project>' && return
+            fi
+        
+            gcloud compute ssh "$1" --zone=us-central1-a --project="$2" && return
+        }
+        
+        kpxc-clip() {
+            if [ -z "$1" ]; then
+                echo '[ERROR] not enough arguments supplied'
+                echo 'usage: kpxc-clip <entry> [<timeout>]' && return
+            fi
+        
+            keepassxc-cli clip -k ~/._/kpxc.keyx\; ~/._/Passwords.kdbx "$1" "${2:-5}"
+        }
+        
+        kpxc-show() {
+            if [ -z "$1" ]; then
+                echo '[ERROR] not enough arguments supplied'
+                echo 'usage: kpxc-show <entry>' && return
+            fi
+        
+            keepassxc-cli show -s -k ~/._/kpxc.keyx\; ~/._/Passwords.kdbx "$1"
+        }
+        
+        kpxc-ls() {
+            if [ -z "$1" ]; then
+                echo '[ERROR] not enough arguments supplied'
+                echo 'usage: kpxc-ls <group>' && return
+            fi
+        
+            keepassxc-cli ls -k ~/._/kpxc.keyx\; ~/._/Passwords.kdbx "${1:-/}"
+        }
+        
+        rdctl_start() {
+            "$HOME/.rd/bin/rdctl" start \
+        		--application.path-management-strategy manual \
+        		--application.start-in-background \
+        		--kubernetes.enabled \
+        		--virtual-machine.memory-in-gb 8 \
+        		--virtual-machine.number-cpus 4
+        }
+        
+        osx_mem() {
+            vm_stat | \
+                perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f Mi\n", "$1:", $2 * $size / 1048576);'
+        }
+        
+        vboxrmv() {
+            if [ -z "$1" ]; then
+                echo "usage: vboxrmv <vm-name>" && return
+            fi
+            echo "removing vm: $1.. "
+            VBoxManage unregistervm "$1" --delete-all
+            echo 'done'
+        }
+        ;;
+    linux)
+        # catch this case, but do nothing
+        ;;
+    *)
+        echo "unknown os: $_UNAME" && return
+        ;;
+esac
+
+unset _UNAME _WHICH
+
+# vim: ft=sh
