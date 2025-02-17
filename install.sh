@@ -2,7 +2,21 @@
 
 set -euo pipefail
 
-stow -t "$HOME" --no-folding bash
-stow -t "$HOME" --no-folding ghostty
-stow -t "$HOME" --no-folding nvim
-stow -t "$HOME" --no-folding tmux
+if &>/dev/null ! command stow; then
+    1>&2 echo -e 'stow is not installed.. exiting'
+    exit 1
+fi
+
+declare -a _PKGS
+_PKGS=(
+    bash
+    ghostty
+    nvim
+    tmux
+)
+
+for _PKG in "${_PKGS[@]}"; do
+    stow -t "$HOME" --no-folding "$_PKG"
+done
+
+unset _PKG _PKGS
