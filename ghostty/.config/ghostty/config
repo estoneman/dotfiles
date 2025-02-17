@@ -11,10 +11,8 @@ mouse-hide-while-typing = "true"
 # window
 title = ""
 fullscreen = "true"
-theme = "Kanagawa Dragon"
 foreground = "white"
 quit-after-last-window-closed = "true"
-window-decoration = "true"
 
 # cursor
 cursor-style = "block"
