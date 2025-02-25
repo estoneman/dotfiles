@@ -1,15 +1,16 @@
-#!/usr/local/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
-if &>/dev/null ! command stow; then
-    1>&2 echo -e 'stow is not installed.. exiting'
+if command stow &>/dev/null; then
+    echo -e 'stow is not installed.. exiting' 1>&2
     exit 1
 fi
 
 declare -a _PKGS
 _PKGS=(
     bash
+    bat
     ghostty
     nvim
     tmux
