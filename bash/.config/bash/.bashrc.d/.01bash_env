@@ -83,6 +83,16 @@ if command direnv >/dev/null 2>&1; then
     eval "$(direnv hook bash)";
 fi
 
+# nvm (node version manager, for various language servers)
+if ! hash nvm >/dev/null 2>&1; then
+    declare -x NVM_DIR
+    NVM_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nvm"
+    # shellcheck disable=1091
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    # shellcheck disable=1091
+    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+fi
+
 # shellcheck disable=SC1091
 case "$_UNAME" in
     darwin)
