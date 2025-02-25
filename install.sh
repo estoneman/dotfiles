@@ -14,6 +14,7 @@ _PKGS=(
     ghostty
     nvim
     tmux
+    tpm
 )
 
 for _PKG in "${_PKGS[@]}"; do
