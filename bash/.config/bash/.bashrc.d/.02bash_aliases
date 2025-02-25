@@ -122,14 +122,16 @@ source_venv() {
         _venv_base="$HOME/.local/share/pipx/venvs"
     fi
 
-    _venv_available="$(ls -A "$_venv_base")"
+    readarray -t _venv_available <<< "$(ls -A "$_venv_base")"
 
     if [ -z "$1" ]; then
         echo 'usage: source_venv <venv>'
-        printf "available virtual environments:\n%s\n" "$_venv_available" && return
+        echo 'available virtual environments:'
+        for v in "${_venv_available[@]}"; do echo "  - $v"; done && return
     elif ! [ -d "$_venv_base/$1" ]; then
-        printf "virtual environment '%s' does not exist" "$1"
-        printf "available virtual environments:\n%s\n" "$_venv_available" && return
+        printf "virtual environment '%s' does not exist\n" "$1"
+        echo 'available virtual environments:'
+        for v in "${_venv_available[@]}"; do echo "  - $v"; done && return
     fi
 
     # shellcheck disable=SC1091,1090
