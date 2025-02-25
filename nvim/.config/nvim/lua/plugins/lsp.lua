@@ -98,6 +98,22 @@ local mason_lspconfig_setup = function()
                     },
                 })
             end,
+            ["pylsp"] = function()
+                lspconfig["pylsp"].setup({
+                    on_attach = on_attach,
+                    capabilities = capabilities,
+                    settings = {
+                        pylsp = {
+                            plugins = {
+                                flake8 = { enabled = true },
+                                pycodestyle = { enabled = true },
+                                mccabe = { enabled = true },
+                                pyflakes = { enabled = true },
+                            },
+                        },
+                    },
+                })
+            end,
             function(server_name)
                 lspconfig[server_name].setup({
                     on_attach = on_attach,
