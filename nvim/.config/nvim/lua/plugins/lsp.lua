@@ -62,6 +62,8 @@ local mason_lspconfig_setup = function()
             "gopls",
             "lua_ls",
             "rust_analyzer",
+            "ruff",
+            "jedi_language_server",
         },
 
         automatic_installation = false,
@@ -75,6 +77,7 @@ local mason_lspconfig_setup = function()
                         Lua = {
                             diagnostics = {
                                 globals = { "Snacks", "autocmd", "vim", },
+                                disable = { "lowercase-global", },
                             }
                         }
                     },
