@@ -13,6 +13,7 @@ _PKGS=(
     bat
     ghostty
     nvim
+    sqls
     tmux
     tpm
 )
