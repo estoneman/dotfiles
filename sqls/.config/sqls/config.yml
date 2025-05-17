@@ -1,0 +1,5 @@
+---
+connections:
+  - alias: mycrib
+    driver: sqlite3
+    dataSourceName: "file:/home/estoneman/Programming/projects/mycrib/sql/mycrib.db"
