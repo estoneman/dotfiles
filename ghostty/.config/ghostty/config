@@ -3,7 +3,7 @@ font-family               = "UbuntuMono Nerd Font"
 font-family-bold          = "UbuntuMono Nerd Font Bold"
 font-family-italic        = "UbuntuMono Nerd Font Italic"
 font-family-bold-italic   = "UbuntuMono Nerd Font Bold Italic"
-font-size = "26"
+font-size = "16"
 
 # mouse
 mouse-hide-while-typing = "true"
@@ -23,3 +23,7 @@ macos-icon-frame = "beige"
 
 # theme
 theme = rose-pine
+
+# shell
+shell-integration = bash
+command = /usr/bin/bash -l -i
