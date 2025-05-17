@@ -7,7 +7,7 @@ end
 
 ---capture command output into stdout
 ---@param cmd string
----@param raw boolean
+---@param raw boolean?
 local function cmdCapture(cmd, raw)
     local proc = assert(io.popen(cmd, 'r'))
     local out = assert(proc:read('*a'))
@@ -26,7 +26,7 @@ local function dashboard(enabled)
     return {
         enabled = enabled,
         preset = {
-            header = cmdCapture("neofetch -L", true),
+            header = cmdCapture("neofetch -L | sed -e 's/\x1b\\[[0-9;?]*[ADhlm]//g' -e '/^$/d'"),
         }
     }
 end
