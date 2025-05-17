@@ -5,23 +5,28 @@ local function explorer(enabled)
     }
 end
 
-local function neofetch()
-    local proc_handle = io.popen("neofetch -L | sed -e 's/\27\\[[0-9;\\?]*[a-zA-Z]//g' -e '/^$/d'")
-    if proc_handle == nil then
-        print("Error: Failed to execute 'neofetch'")
-        return ""
-    end
+---capture command output into stdout
+---@param cmd string
+---@param raw boolean
+local function cmdCapture(cmd, raw)
+    local proc = assert(io.popen(cmd, 'r'))
+    local out = assert(proc:read('*a'))
 
-    local proc_out = proc_handle:read('a')
+    proc:close()
 
-    return proc_out
+    if raw then return out end
+
+    out = string.gsub(out, '^%s+', '')
+    out = string.gsub(out, '%s+$', '')
+
+    return out
 end
 
 local function dashboard(enabled)
     return {
         enabled = enabled,
         preset = {
-            header = neofetch(),
+            header = cmdCapture("neofetch -L", true),
         }
     }
 end
