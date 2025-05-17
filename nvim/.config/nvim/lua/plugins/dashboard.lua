@@ -1,33 +1,23 @@
 local conf = {}
 
-local function neofetch()
-    local proc_handle = io.popen("neofetch -L | sed -e 's/\27\\[[0-9;\\?]*[a-zA-Z]//g' -e '/^$/d'")
-    if proc_handle == nil then
-        print("Error: Failed to execute 'neofetch'")
-        return ""
-    end
+---capture command output into stdout
+---@param cmd string
+---@param raw boolean
+local function cmdCapture(cmd, raw)
+    local proc = assert(io.popen(cmd, 'r'))
+    local out = assert(proc:read('*a'))
 
-    local proc_out = proc_handle:read('a')
+    proc:close()
 
-    return proc_out
+    if raw then return out end
+
+    out = string.gsub(out, '^%s+', '')
+    out = string.gsub(out, '%s+$', '')
+
+    return out
 end
 
-local function split(s, sep)
-    if sep == nil then
-        sep = '\n'
-    end
-
-    local t = {}
-    table.insert(t, "")
-    for line in string.gmatch(s, "([^" .. sep .. "]+)") do
-        table.insert(t, line)
-    end
-    table.insert(t, "")
-
-    return t
-end
-
-conf.header = split(neofetch())
+conf.header = cmdCapture("neofetch -L", true)
 
 conf.center = {
   {
