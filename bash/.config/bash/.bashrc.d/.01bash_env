@@ -4,12 +4,11 @@
 declare -x DOCKER_HOST EDITOR KUBE_EDITOR PATH PROMPT_COMMAND TERM VISUAL
 
 _UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
-_WHICH=/usr/bin/which
 
 DOCKER_HOST="unix:///$HOME/.rd/docker.sock"
 EDITOR=nvim
 KUBE_EDITOR="$EDITOR"
-PATH="$HOME/.local/share/nvim/mason/bin:$HOME/.cargo/bin:$HOME/.local/bin/:/usr/local/bin:/usr/local/sbin:/opt/bin:/usr/bin:/usr/sbin:/bin:/sbin"
+PATH="$HOME/.gem/ruby/3.4.0/bin:/usr/local/opt/ruby/bin:$HOME/.local/share/nvim/mason/bin:$HOME/.cargo/bin:$HOME/.local/bin/:$PATH"
 TERM='tmux-256color'
 VISUAL=nvim
 
@@ -73,18 +72,18 @@ _prompt_command () {
 [ -f "$HOME/.fzf.bash" ] && source "$HOME/.fzf.bash"
 
 # zoxide
-[ -x "$("$_WHICH" zoxide)" ] && eval "$(zoxide init bash)"
+command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
 
 # go packages
 [ -d "$HOME/go/bin" ] && PATH="$HOME/go/bin:$PATH"
 
 # direnv
-if command direnv >/dev/null 2>&1; then
+if command -v direnv &>/dev/null; then
     eval "$(direnv hook bash)";
 fi
 
 # nvm (node version manager, for various language servers)
-if ! hash nvm >/dev/null 2>&1; then
+if command -v nvm &>/dev/null; then
     declare -x NVM_DIR
     NVM_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nvm"
     # shellcheck disable=1091
@@ -140,6 +139,6 @@ case "$_UNAME" in
         ;;
 esac
 
-unset _UNAME _WHICH
+unset _UNAME
 
 # vim: ft=sh

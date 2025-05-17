@@ -2,7 +2,6 @@
 # .bash_aliases
 
 _UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
-_WHICH=/usr/bin/which
 
 # helpful ls
 alias ls='ls --color=auto'
@@ -19,29 +18,29 @@ alias cp='cp -i'
 alias mv='mv -i'
 
 # common
-if "$_WHICH" bat &>/dev/null; then
+if command -v bat &>/dev/null; then
     alias cat='bat'
 fi
 
-if "$_WHICH" htop &>/dev/null; then
+if command -v htop &>/dev/null; then
     alias htop='htop -d 12' # -d (delay) is measured in tenths of a second
 fi
 
-if "$_WHICH" kubectl &>/dev/null; then
+if command -v kubectl &>/dev/null; then
     alias k='kubectl'
 fi
 
-if "$_WHICH" nvim &>/dev/null; then
+if command -v nvim &>/dev/null; then
     alias vi='vim'
     alias vim='nvim'
     alias view='vim -R'
 fi
 
-if "$_WHICH" tmux &>/dev/null; then
+if command -v tmux &>/dev/null; then
     alias tmnew='tmux new -s'
 fi
 
-if type -t z &>/dev/null && "$_WHICH" zoxide &>/dev/null; then
+if type -t z &>/dev/null && command -v zoxide &>/dev/null; then
     alias cd='z'
 fi
 
@@ -90,7 +89,7 @@ ping_check() {
     done
 }
 
-if "$_WHICH" rg &>/dev/null; then
+if command -v rg &>/dev/null; then
     rgf() {
         if [ -z "$1" ]; then
             echo 'usage: rgf <file-pattern> [<root-search-directory>]' && return
@@ -247,6 +246,6 @@ case "$_UNAME" in
         ;;
 esac
 
-unset _UNAME _WHICH
+unset _UNAME
 
 # vim: ft=sh

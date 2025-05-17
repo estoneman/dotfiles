@@ -2,7 +2,6 @@
 # .bash_completion
 
 _UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
-_WHICH=/usr/bin/which
 
 declare -A completions=(
     [podman]='podman completion bash'
@@ -12,12 +11,12 @@ declare -A completions=(
 )
 
 for c in "${!completions[@]}"; do
-    if "$_WHICH" "$c" &>/dev/null; then
+    if command -v "$c" &>/dev/null; then
         eval "$(${completions[$c]})"
     fi
 done
 
-if "$_WHICH" kubectl &>/dev/null; then
+if command -v kubectl &>/dev/null; then
     complete -o default -F __start_kubectl k
 fi
 
@@ -32,7 +31,5 @@ case "$_UNAME" in
         echo "unknown os: $_UNAME"
         ;;
 esac
-
-unset _WHICH
 
 # vim: ft=sh

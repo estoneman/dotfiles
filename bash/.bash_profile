@@ -2,6 +2,7 @@
 
 declare -x XDG_CONFIG_HOME
 
+PATH='/usr/local/bin:/usr/local/sbin:/opt/bin:/usr/bin:/usr/sbin:/bin:/sbin'
 (cd "$HOME/dotfiles" && ./install.sh)
 
 XDG_CONFIG_HOME="$HOME/.config"
