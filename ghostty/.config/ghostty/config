@@ -26,4 +26,3 @@ theme = rose-pine
 
 # shell
 shell-integration = bash
-command = /usr/bin/bash -l -i
