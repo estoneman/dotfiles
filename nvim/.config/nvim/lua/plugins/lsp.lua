@@ -19,34 +19,7 @@ local on_attach = function(_, bufnr)
     )
 end
 
--- local function is_ansible()
---     local path = vim.fn.expand("%:p")
---     local task_regex = string.format([[ '%s' =~ '\v/(roles|handlers|tasks)/.*\.ya?ml$' ]], path)
---     local var_regex = string.format([[ '%s' =~ '\v/(group|host)_vars/.*\.ya?ml$' ]], path)
--- 
---     if vim.api.nvim_eval(task_regex) ~= 0 then
---         return 1
---     end
--- 
---     if vim.api.nvim_eval(var_regex) ~= 0 then
---         return 1
---     end
--- 
---     return 0
--- end
--- 
--- vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
---   pattern = "*",
---   group = vim.api.nvim_create_augroup("yaml_ansible", { clear = true }),
---   callback = function ()
---       if is_ansible() == 0 then
---           vim.bo.filetype = "yaml.ansible"
---       end
---   end
--- })
-
 local mason_lspconfig_setup = function()
-    local lspconfig = require("lspconfig")
     local cmp_lsp = require("cmp_nvim_lsp")
     local capabilities = vim.tbl_deep_extend(
         "force",
@@ -54,6 +27,50 @@ local mason_lspconfig_setup = function()
         vim.lsp.protocol.make_client_capabilities(),
         cmp_lsp.default_capabilities()
     )
+
+    vim.lsp.config("lua_ls", {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+            Lua = {
+                diagnostics = {
+                    globals = { "Snacks", "autocmd", "vim", },
+                },
+            },
+        }
+    })
+    vim.lsp.config("gopls", {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+            gopls = {
+                analyses = {
+                    unusedparams = true,
+                },
+                staticcheck = true,
+                gofumpt = true,
+            },
+        }
+    })
+    vim.lsp.config("pylsp", {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+            pylsp = {
+                plugins = {
+                    flake8 = { enabled = true },
+                    pycodestyle = { enabled = false },
+                    mccabe = { enabled = false },
+                    pyflakes = { enabled = false },
+                },
+            },
+        }
+    })
+    vim.lsp.config("clangd", {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {},
+    })
 
     return {
         ensure_installed = {
@@ -63,63 +80,7 @@ local mason_lspconfig_setup = function()
             "lua_ls",
             "rust_analyzer",
             "ruff",
-            "jedi_language_server",
-        },
-
-        automatic_installation = false,
-
-        handlers = {
-            ["lua_ls"] = function()
-                lspconfig["lua_ls"].setup({
-                    on_attach = on_attach,
-                    capabilities = capabilities,
-                    settings = {
-                        Lua = {
-                            diagnostics = {
-                                globals = { "Snacks", "autocmd", "vim", },
-                                disable = { "lowercase-global", },
-                            }
-                        }
-                    },
-                })
-            end,
-            ["gopls"] = function()
-                lspconfig["gopls"].setup({
-                    on_attach = on_attach,
-                    capabilities = capabilities,
-                    settings = {
-                        gopls = {
-                            analyses = {
-                                unusedparams = true,
-                            },
-                            staticcheck = true,
-                            gofumpt = true,
-                        },
-                    },
-                })
-            end,
-            ["pylsp"] = function()
-                lspconfig["pylsp"].setup({
-                    on_attach = on_attach,
-                    capabilities = capabilities,
-                    settings = {
-                        pylsp = {
-                            plugins = {
-                                flake8 = { enabled = true },
-                                pycodestyle = { enabled = true },
-                                mccabe = { enabled = true },
-                                pyflakes = { enabled = true },
-                            },
-                        },
-                    },
-                })
-            end,
-            function(server_name)
-                lspconfig[server_name].setup({
-                    on_attach = on_attach,
-                    capabilities = capabilities,
-                })
-            end,
+            "pylsp",
         },
     }
 end
@@ -128,8 +89,8 @@ return {
     "neovim/nvim-lspconfig",
 
     dependencies = {
-        "williamboman/mason.nvim",
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason.nvim",
+        "mason-org/mason-lspconfig.nvim",
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
