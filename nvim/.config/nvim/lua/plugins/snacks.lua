@@ -26,7 +26,7 @@ local function dashboard(enabled)
     return {
         enabled = enabled,
         preset = {
-            header = cmdCapture("neofetch -L | sed -e 's/\x1b\\[[0-9;?]*[ADhlm]//g' -e '/^$/d'"),
+            header = cmdCapture("neofetch -L --ascii_bold off | sed -e 's/\x1b\\[[0-9;?]*[hlmAD]//g' -e '/^$/d'"),
         }
     }
 end
