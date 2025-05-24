@@ -2,7 +2,7 @@ local conf = {}
 
 ---capture command output into stdout
 ---@param cmd string
----@param raw boolean
+---@param raw boolean?
 local function cmdCapture(cmd, raw)
     local proc = assert(io.popen(cmd, 'r'))
     local out = assert(proc:read('*a'))
