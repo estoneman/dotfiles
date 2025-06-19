@@ -8,7 +8,7 @@ _UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
 DOCKER_HOST="unix:///$HOME/.rd/docker.sock"
 EDITOR=nvim
 KUBE_EDITOR="$EDITOR"
-PATH="$HOME/.gem/ruby/3.4.0/bin:/usr/local/opt/ruby/bin:$HOME/.local/share/nvim/mason/bin:$HOME/.cargo/bin:$HOME/.local/bin/:$PATH"
+PATH="$HOME/.gem/ruby/3.4.0/bin:/usr/local/opt/ruby/bin:$HOME/.local/share/nvim/mason/bin:$HOME/.cargo/bin:$HOME/.local/bin/:/usr/local/opt/curl/bin:$PATH"
 TERM='tmux-256color'
 VISUAL=nvim
 

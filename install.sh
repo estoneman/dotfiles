@@ -9,6 +9,7 @@ fi
 
 declare -a _PKGS
 _PKGS=(
+    alacritty
     bash
     bat
     ghostty
