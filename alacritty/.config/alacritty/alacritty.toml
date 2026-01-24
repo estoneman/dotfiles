@@ -29,3 +29,6 @@ bindings = [
 
 [selection]
 save_to_clipboard = true
+
+[terminal]
+shell = { program = "/usr/bin/bash", args = ["-l"] }
