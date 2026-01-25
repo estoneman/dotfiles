@@ -10,7 +10,7 @@ size = 24
 family = "UbuntuMono Nerd Font"
 
 [window]
-decorations = "Full"
+decorations = "None"
 opacity = 0.91
 startup_mode = "Maximized"
 resize_increments = true
