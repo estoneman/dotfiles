@@ -75,7 +75,9 @@ _prompt_command () {
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
 
 # go packages
-[ -d "$HOME/go/bin" ] && PATH="$HOME/go/bin:$PATH"
+if [ -d "$HOME/go/bin" ]; then
+    PATH="$HOME/go/bin:$PATH"
+fi
 
 # direnv
 if command -v direnv &>/dev/null; then
@@ -83,14 +85,12 @@ if command -v direnv &>/dev/null; then
 fi
 
 # nvm (node version manager, for various language servers)
-if command -v nvm &>/dev/null; then
-    declare -x NVM_DIR
-    NVM_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nvm"
-    # shellcheck disable=1091
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-    # shellcheck disable=1091
-    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-fi
+declare -x NVM_DIR
+NVM_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nvm"
+# shellcheck disable=1091
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# shellcheck disable=1091
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
 # shellcheck disable=SC1091
 case "$_UNAME" in

@@ -1,0 +1,25 @@
+# shellcheck shell=bash
+# .bash_options
+
+declare -x HISTCONTROL
+
+doset() {
+    for s in "$@"; do
+        set -o $s
+    done
+}
+
+doshopt() {
+    for s in "$@"; do
+        shopt -s $s
+    done
+}
+
+doshopt autocd checkwinsize
+doset emacs noclobber
+
+HISTCONTROL=ignoreboth:erasedups
+
+unset _SETTINGS _SHOPTS
+
+# vim: ft=sh

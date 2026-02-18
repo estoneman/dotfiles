@@ -65,6 +65,7 @@ local colorscheme = {
             styles = {
                 bold = false,
                 italic = false,
+                transparency = true,
             },
         },
     },

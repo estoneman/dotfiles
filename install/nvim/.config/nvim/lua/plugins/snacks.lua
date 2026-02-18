@@ -5,28 +5,92 @@ local function explorer(enabled)
     }
 end
 
----capture command output into stdout
----@param cmd string
----@param raw boolean?
-local function cmdCapture(cmd, raw)
-    local proc = assert(io.popen(cmd, 'r'))
-    local out = assert(proc:read('*a'))
+local dashboardConf = {}
 
-    proc:close()
-
-    if raw then return out end
-
-    out = string.gsub(out, '^%s+', '')
-    out = string.gsub(out, '%s+$', '')
-
+local function capture(cmd)
+    local f = assert(io.popen(cmd, "r"))
+    local out = assert(f:read("*a"))
+    f:close()
     return out
 end
+
+-- dashboardConf.header = capture("fastfetch --pipe -s ':' | sed -E -e 's/\x1B\\[[0-9;]*[A-Za-z]//g' -e '/^$/d' -e 's/\\s+$//'")
+dashboardConf.header = [[
+           .-------------------------:
+          .+=========================.
+         :++===++==================-       :++-
+        :*++====+++++=============-        .==:
+       -*+++=====+***++==========:
+      =*++++========------------:
+     =*+++++=====-                     ...
+   .+*+++++=-===:                    .=+++=:
+  :++++=====-==:                     -*****+
+ :++========-=.                      .=+**+.
+.+==========-.                          .
+ :+++++++====-                                .--==-.
+  :++==========.                             :+++++++:
+   .-===========.                            =*****+*+
+    .-===========:                           .+*****+:
+      -=======++++:::::::::::::::::::::::::-:  .---:
+       :======++++====+++******************=.
+        :=====+++==========++++++++++++++*-
+         .====++==============++++++++++*-
+          .===+==================+++++++:
+           .-=======================+++:
+             ..........................
+]]
+
+dashboardConf.center = {
+  {
+    icon = "󰈞  ",
+    desc = "Find  File                              ",
+    action = function()
+        vim.cmd('Telescope find_files cwd=.')
+    end,
+    key = "<Leader> f f",
+  },
+  {
+    icon = "󰈢  ",
+    desc = "Recently opened files                   ",
+    action = function ()
+        vim.cmd('Telescope frecency')
+    end,
+    key = "<Leader> f r",
+  },
+  {
+    icon = "󰈬  ",
+    desc = "Project grep                            ",
+    action = function()
+        vim.cmd('Telescope live_grep')
+    end,
+    key = "<Leader> f g",
+  },
+  {
+    icon = "  ",
+    desc = "Open Nvim config                        ",
+    action = "tabnew $MYVIMRC | tcd %:p:h",
+    key = "<Leader> e v",
+  },
+  {
+    icon = "  ",
+    desc = "New file                                ",
+    action = "enew",
+    key = "e",
+  },
+  {
+    icon = "󰗼  ",
+    desc = "Quit Nvim                               ",
+    action = "qa",
+    key = "q",
+  },
+}
 
 local function dashboard(enabled)
     return {
         enabled = enabled,
         preset = {
-            header = cmdCapture("neofetch -L --ascii_bold off | sed -e 's/\x1b\\[[0-9;?]*[hlmAD]//g' -e '/^$/d'"),
+            header = dashboardConf.header,
+            center = dashboardConf.center,
         }
     }
 end
