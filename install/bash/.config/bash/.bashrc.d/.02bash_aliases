@@ -28,6 +28,12 @@ fi
 
 if command -v kubectl &>/dev/null; then
     alias k='kubectl'
+    complete -F __start_kubectl k
+fi
+
+if command -v minikube &>/dev/null; then
+    alias k='minikube kubectl --'
+    complete -F __start_kubectl k
 fi
 
 if command -v nvim &>/dev/null; then
@@ -46,6 +52,12 @@ fi
 
 if type -t z &>/dev/null && command -v zoxide &>/dev/null; then
     alias cd='z'
+fi
+
+if { command -v pass && command -v sudo; } &>/dev/null; then
+    batch_sudo() {
+        pass show user/terminull | sudo --stdin "$@" 2>/dev/null
+    }
 fi
 
 docker_tags() {
