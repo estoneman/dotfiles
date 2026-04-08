@@ -71,6 +71,11 @@ local mason_lspconfig_setup = function()
         capabilities = capabilities,
         settings = {},
     })
+    vim.lsp.config("helm_ls", {
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {},
+    })
 
     return {
         ensure_installed = {
