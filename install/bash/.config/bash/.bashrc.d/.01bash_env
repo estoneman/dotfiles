@@ -84,6 +84,22 @@ if command -v direnv &>/dev/null; then
     eval "$(direnv hook bash)";
 fi
 
+# crc and oc
+if command -v crc &>/dev/null; then
+    eval "$(crc oc-env)"
+fi
+
+# k8s
+if command -v kubectl &>/dev/null; then
+    # shellcheck disable=SC1090
+    source <(kubectl completion bash)
+fi
+
+if command -v minikube &>/dev/null; then
+    # shellcheck disable=SC1090
+    source <(minikube kubectl -- completion bash)
+fi
+
 # nvm (node version manager, for various language servers)
 declare -x NVM_DIR
 NVM_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nvm"
