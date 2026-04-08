@@ -14,6 +14,7 @@ return {
             "markdown",
             "markdown_inline",
             "norg",
+            "rust",
             "scss",
             "svelte",
             "tsx",
