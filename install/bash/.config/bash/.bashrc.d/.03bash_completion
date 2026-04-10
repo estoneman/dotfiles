@@ -8,6 +8,7 @@ declare -A completions=(
     [kubectl]='kubectl completion bash'
     [docker]='docker completion bash'
     [rdctl]='rdctl completion bash'
+    [oc]='oc completion bash'
 )
 
 for c in "${!completions[@]}"; do
