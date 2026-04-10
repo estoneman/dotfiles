@@ -18,7 +18,7 @@ alias cp='cp -i'
 alias mv='mv -i'
 
 # common
-if command -v bat &>/dev/null; then
+if { command -v bat || command -v batcat; } &>/dev/null; then
     alias cat='bat'
 fi
 
