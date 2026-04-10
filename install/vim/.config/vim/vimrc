@@ -1,0 +1,29 @@
+syntax on
+
+set nocp
+filetype plugin on
+
+set term=tmux-256color
+set enc=utf-8
+set et ai sts=2 ts=2 sw=2 tw=80
+set nu rnu
+set noswapfile
+set nobackup
+set hidden
+set so=8
+
+call plug#begin()
+
+" list desired plugins here
+Plug 'rose-pine/vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+call plug#end()
+
+" colorscheme
+colorscheme rosepine
+set bg=dark
+
+" make background of vim transparent
+hi Normal guibg=NONE ctermbg=NONE
