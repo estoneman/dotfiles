@@ -86,19 +86,48 @@ hi Normal guibg=NONE ctermbg=NONE
 """""
 " => Maps
 """""
-" i like navigating my projects like this for now
-nmap <silent> <leader>Ex :Lexplore<cr>:vert res -35<cr>:exe ":NetrwC " .. winnr() + 1<cr><c-w>l
-" same as above, but stay in netrw
-nmap <silent> <leader>Ed :Lexplore<cr>:vert res -35<cr>:exe ":NetrwC " .. winnr() + 1<cr>
-" reverse the above action
-function! CloseNetrw()
-    if &filetype == 'netrw'
-        return "\<c-w>q"
-    else
-        return ":" .. winnr('h') .. "q\<cr>"
+func! s:OpenNetrw(opts) abort
+    " opts:
+    "   cols (Number): number of columns to resize netrw window
+    "   stay (bool): whether to stay in netrw window or not
+    let l:cols = get(a:opts, 'cols')
+    let l:stay = get(a:opts, 'stay')
+    let l:edit_window = 1
+
+    Lexplore
+    exe "vert res " .. l:cols
+    for i in range(winnr(), winnr('$'))
+        let l:modifiable = getbufvar(winbufnr(i), '&modifiable')
+        if l:modifiable == 1
+            let l:edit_window = i
+            break
+        endif
+    endfor
+
+    exe 'NetrwC ' .. l:edit_window
+
+    if !l:stay
+        exe l:edit_window .. "wincmd w"
     endif
-endfunction
-nmap <expr> <silent> <leader>ex CloseNetrw()
+endfunc
+
+func! s:CloseNetrw() abort
+    if &filetype ==# 'netrw'
+        close
+    else
+        let l:left = winnr('h')
+        if l:left != winnr()
+            execute l:left .. 'close'
+        endif
+    endif
+endfunc
+
+" i like navigating my projects like this for now
+nnoremap <silent> <leader>Ex :call <SID>OpenNetrw({'cols': -35, 'stay': v:false})<cr>
+" same as above, but stay in netrw
+nnoremap <silent> <leader>Ed :call <SID>OpenNetrw({'cols': -35, 'stay': v:true})<cr>
+" reverse the above action
+nnoremap <silent> <leader>ex :call <SID>CloseNetrw()<cr>
 
 " beast of a map this one is
 nmap <leader>w :w!<cr>
