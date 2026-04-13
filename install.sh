@@ -9,6 +9,7 @@ chk_cmd() {
 
 _CMD_DEPS=(
     fastfetch
+    rg
     stow
 )
 
@@ -23,5 +24,11 @@ done
     cd ./install
     for _PKG in *; do
         stow -t "$HOME" --no-folding "$_PKG"
+
+        # find broken links and remove them
+        linkdir=$(fd -H -d 1 -t d . "$_PKG" -x echo "$HOME/{/}/$_PKG")
+        rg --hidden -L --files . $linkdir 2>&1 \
+            | awk '/os error/ { print substr($2, 0, length($2)-1) }' \
+            | xargs rm -f
     done
 )
