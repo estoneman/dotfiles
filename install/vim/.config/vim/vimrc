@@ -1,17 +1,71 @@
-syntax on
+"""""
+" Maintainer:
+"       Ethan Stoneman - @estoneman
+"
+" Sections:
+"    -> General
+"    -> Options
+"    -> Settings
+"    -> Plugins (managed via Plug)
+"    -> Colors
+"    -> Maps
+"""""
 
-set nocp
+"""""
+" => General
+"""""
+" enables lexical highlighting
+syntax enable
+" enable filetype plugins
 filetype plugin on
+filetype indent on
+let mapleader = ","
 
+"""""
+" => Options
+"""""
+" my statusline (see $XDG_CONFIG_HOME/autoload/statusline.vim)
+set statusline=%{%statusline#RegOrNetrw()%}
+" i live in tmux
 set term=tmux-256color
+" set character encoding
 set enc=utf-8
-set et ai sts=2 ts=2 sw=2 tw=80
+" expand tabs, enable autoindent, and set textwidth to 80 respectively
+set et sw=4 ts=4 ai tw=80
+" relative line numbering
 set nu rnu
+" disable swapfile
 set noswapfile
+" disable backup
 set nobackup
+" don't keep modified buffers open when navigating
 set hidden
+" set scrolloff
 set so=8
+" pretty cool command line completion
+set wildmenu
+" mini pop-up menu of completions
+set wildoptions=pum
+" ignore case when searching
+set ignorecase
+" when searching try to be smart about letter case
+set smartcase
+" highlight search matches
+set hlsearch
+" only show next match when searching
+set incsearch
+" add extra column to the left of buffers
+set foldcolumn=1
 
+"""""
+" => Settings
+"""""
+let g:netrw_banner=0
+let g:netrw_liststyle=3
+
+"""""
+" => Plugins
+"""""
 call plug#begin()
 
 " list desired plugins here
@@ -21,9 +75,34 @@ Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
-" colorscheme
+"""""
+" => Colors
+"""""
 colorscheme rosepine
 set bg=dark
-
 " make background of vim transparent
 hi Normal guibg=NONE ctermbg=NONE
+
+"""""
+" => Maps
+"""""
+" i like navigating my projects like this for now
+nmap <silent> <leader>Ex :Lexplore<cr>:vert res -35<cr>:exe ":NetrwC " .. winnr() + 1<cr><c-w>l
+" same as above, but stay in netrw
+nmap <silent> <leader>Ed :Lexplore<cr>:vert res -35<cr>:exe ":NetrwC " .. winnr() + 1<cr>
+" reverse the above action
+function! CloseNetrw()
+    if &filetype == 'netrw'
+        return "\<c-w>q"
+    else
+        return ":" .. winnr('h') .. "q\<cr>"
+    endif
+endfunction
+nmap <expr> <silent> <leader>ex CloseNetrw()
+
+" beast of a map this one is
+nmap <leader>w :w!<cr>
+" disable highlighting (i use when i'm done searching)
+nmap <silent> <leader><c-h> :noh<cr>
+" quick quit all windows (after writing all modifiable buffers of course)
+nmap <silent> <leader>qa :wa<cr>:qa<cr>
