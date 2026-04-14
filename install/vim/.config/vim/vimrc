@@ -24,7 +24,7 @@ let mapleader = ","
 """""
 " => Options
 """""
-" my statusline (see $XDG_CONFIG_HOME/autoload/statusline.vim)
+" my statusline (see $XDG_CONFIG_HOME/vim/autoload/statusline.vim)
 set statusline=%{%statusline#RegOrNetrw()%}
 " i live in tmux
 set term=tmux-256color
@@ -86,28 +86,54 @@ hi Normal guibg=NONE ctermbg=NONE
 """""
 " => Maps
 """""
-func! s:OpenNetrw(opts) abort
-    " opts:
-    "   cols (Number): number of columns to resize netrw window
-    "   stay (bool): whether to stay in netrw window or not
-    let l:cols = get(a:opts, 'cols')
-    let l:stay = get(a:opts, 'stay')
-    let l:edit_window = 1
-
-    Lexplore
-    exe "vert res " .. l:cols
+func! s:SearchBufVar(name, value) abort
+    " find first buffer that has variable 'name' set to 'value'
+    " returns window number of buffer > 0 when found, 0 when not
+    " found
     for i in range(winnr(), winnr('$'))
-        let l:modifiable = getbufvar(winbufnr(i), '&modifiable')
-        if l:modifiable == 1
-            let l:edit_window = i
-            break
+        if getbufvar(winbufnr(i), '&' .. a:name) == a:value
+            return i
         endif
     endfor
 
-    exe 'NetrwC ' .. l:edit_window
+    return 0
+endfunc
 
-    if !l:stay
-        exe l:edit_window .. "wincmd w"
+func! s:LargestEntry(dir) abort
+    let l:entries = readdir(a:dir)
+    if len(l:entries) == 0
+        return 0
+    endif
+
+    let l:max = l:entries[0]
+    for e in l:entries
+        let l:len_e = len(e)
+        if len_e > l:max
+            let l:max = len_e
+        endif
+    endfor
+
+    return l:max
+endfunc
+
+func! s:OpenNetrw(stay) abort
+    " stay (bool): whether to stay in netrw window or not
+    let l:already_open = v:false
+    let l:win = s:SearchBufVar('filetype', 'netrw')
+    if l:win != 0
+        let l:already_open = v:true
+    endif
+
+    if !l:already_open
+        let l:width = &columns / s:LargestEntry('.')
+        if l:width == 0
+            let l:width = (&columns / 6)
+        endif
+        exe l:width .. "Lexplore"
+    endif
+
+    if !a:stay
+        exe g:netrw_chgwin .. "wincmd w"
     endif
 endfunc
 
@@ -123,9 +149,9 @@ func! s:CloseNetrw() abort
 endfunc
 
 " i like navigating my projects like this for now
-nnoremap <silent> <leader>Ex :call <SID>OpenNetrw({'cols': -35, 'stay': v:false})<cr>
+nnoremap <silent> <leader>Ex :call <SID>OpenNetrw(v:false)<cr>
 " same as above, but stay in netrw
-nnoremap <silent> <leader>Ed :call <SID>OpenNetrw({'cols': -35, 'stay': v:true})<cr>
+nnoremap <silent> <leader>Ed :call <SID>OpenNetrw(v:true)<cr>
 " reverse the above action
 nnoremap <silent> <leader>ex :call <SID>CloseNetrw()<cr>
 
