@@ -25,6 +25,7 @@ let mapleader = ","
 " => Options
 """""
 " my statusline (see $XDG_CONFIG_HOME/vim/autoload/statusline.vim)
+set laststatus=2
 set statusline=%{%statusline#RegOrNetrw()%}
 " i live in tmux
 set term=tmux-256color
@@ -72,6 +73,7 @@ call plug#begin()
 Plug 'rose-pine/vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'terrastruct/d2-vim'
 
 call plug#end()
 
@@ -125,11 +127,14 @@ func! s:OpenNetrw(stay) abort
     endif
 
     if !l:already_open
-        let l:width = &columns / s:LargestEntry('.')
-        if l:width == 0
-            let l:width = (&columns / 6)
-        endif
-        exe l:width .. "Lexplore"
+        let l:max = &columns / 5
+        let l:min = &columns / 6
+
+        let l:pad = 1
+        let l:width = min([l:max, s:LargestEntry('.')])
+        let l:width = max([l:width, l:min])
+
+        exe (l:width + (2*l:pad)).. "Lexplore"
     endif
 
     if !a:stay
@@ -161,3 +166,10 @@ nmap <leader>w :w!<cr>
 nmap <silent> <leader><c-h> :noh<cr>
 " quick quit all windows (after writing all modifiable buffers of course)
 nmap <silent> <leader>qa :wa<cr>:qa<cr>
+" switch between previous and current buffers while writing previous
+nmap <silent> <leader>bp :w!<cr>:b#<cr>
+" open buffer list quicker
+nmap <silent> <leader>ls :ls<cr>
+
+" c preferences
+au BufRead,BufNewFile *.c,*.h set sts=2 ts=2 sw=2
