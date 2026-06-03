@@ -9,6 +9,7 @@ declare -A completions=(
     [docker]='docker completion bash'
     [rdctl]='rdctl completion bash'
     [oc]='oc completion bash'
+    [helm]='helm completion bash'
 )
 
 for c in "${!completions[@]}"; do
