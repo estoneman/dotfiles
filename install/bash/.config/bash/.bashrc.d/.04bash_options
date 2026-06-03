@@ -20,6 +20,4 @@ doset emacs noclobber
 
 HISTCONTROL=ignoreboth:erasedups
 
-unset _SETTINGS _SHOPTS
-
 # vim: ft=sh
