@@ -53,6 +53,7 @@ fi
 
 if command -v tmux &>/dev/null; then
     alias tmnew='tmux new -s'
+    alias tma='tmux a -t'
 fi
 
 if command -v yt-dlp &>/dev/null; then
@@ -188,6 +189,24 @@ if alias tmnew &>/dev/null; then
     }
 fi
 
+urlencode() {
+    # usage: urlencode "string"
+    local LC_ALL=C
+    for (( i = 0; i < ${#1}; i++ )); do
+        : "${1:i:1}"
+        case "$_" in
+            [a-zA-Z0-9.~_-])
+                printf '%s' "$_"
+            ;;
+
+            *)
+                printf '%%%02X' "'$_"
+            ;;
+        esac
+    done
+    printf '\n'
+}
+
 case "$_UNAME" in
     darwin)
         alias brew_all='brew update && brew upgrade && brew cleanup'
@@ -270,7 +289,5 @@ case "$_UNAME" in
         echo "unknown os: $_UNAME" && return
         ;;
 esac
-
-unset _UNAME
 
 # vim: ft=sh
