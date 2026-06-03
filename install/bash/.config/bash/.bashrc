@@ -9,5 +9,3 @@ if [ -d "$_RC_D" ]; then
         . "${_RC_D}/${_RC}"
     done
 fi
-
-unset _LOAD_ORDER _RC _RC_D
