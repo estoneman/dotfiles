@@ -57,6 +57,8 @@ set hlsearch
 set incsearch
 " add extra column to the left of buffers
 set foldcolumn=1
+" shell
+set shell=bash\ -l
 
 """""
 " => Settings
