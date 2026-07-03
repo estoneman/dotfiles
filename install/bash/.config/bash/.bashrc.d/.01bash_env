@@ -86,7 +86,7 @@ fi
 
 # crc and oc
 if command -v crc &>/dev/null; then
-    eval "$(crc oc-env)"
+    eval "$(crc oc-env &>/dev/null)"
 fi
 
 # k8s
