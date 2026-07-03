@@ -116,6 +116,7 @@ ping_check() {
 }
 
 if command -v rg &>/dev/null; then
+    alias grep='rg'
     rgf() {
         if [ -z "$1" ]; then
             echo 'usage: rgf <file-pattern> [<root-search-directory>]' && return
